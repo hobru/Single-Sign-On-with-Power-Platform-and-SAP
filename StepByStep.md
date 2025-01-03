@@ -4,7 +4,8 @@ You can find the HTTP REST calls in [this script](REST-Client-Scripts-For-SSO.ht
 
 The goal is not to end up with the super sophisticated Policy created by my colleague Martin Pankraz, but to show the creation of the policy and only focus on he main parts. The result is not meant to be used in production (again: here the policy from [Martin](https://github.com/Azure/api-management-policy-snippets/blob/master/examples/Request%20OAuth2%20access%20token%20from%20SAP%20using%20AAD%20JWT%20token.xml) is much better), but to help you understand the relevant steps. 
 
-> [!IMPORTANT] Whenever I follow tutorials, I find it super helpful to find "real" values in the documentation. Because of this I have litterally copy and pasted all the values, names and credentials from my setup in this document. I have used very simple passwords (which I obviously don't use in my real configuration) and I have also deleted all the configurations afterwards. I hope this helps you as well and does not encourage you to hack my demo system :-)
+> [!IMPORTANT] 
+> Whenever I follow tutorials, I find it super helpful to find "real" values in the documentation. Because of this I have litterally copy and pasted all the values, names and credentials from my setup in this document. I have used very simple passwords (which I obviously don't use in my real configuration) and I have also deleted all the configurations afterwards. I hope this helps you as well and does not encourage you to hack my demo system :-)
 
 ## Create a Simple API Proxy in Azure APIM
 ### Setup hard-coded SSO in the APIM Policy
@@ -112,6 +113,7 @@ With this we can update the policy to make a callout to this URL whenever the AP
         </send-request>
 ```
 ![APIM Policy](images/sbs/APIM-Policy1.jpg)
+
 > [!TIP]
 > The final policy of this exercise can be found [here](APIM-Policy.xml)
 
