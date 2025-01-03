@@ -1,0 +1,87 @@
+### Use this file in Visual Studio Code with the REST Client extension
+### I have used this REST Client extension: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+### Just open it and click on the "Send Request" link in the top right corner of each request to execute
+### Make sure to replace the placeholders with your values
+### The first call (https://login.microsoftonline.com/...) is a manual step to get the SAML assertion which has to be called in a browser window
+### The other calls can be executed in the REST Client extension
+### For more information on the OAuth 2.0 On-Behalf-Of flow, see https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow
+### and check out the repo at https://github.com/hobru/Single-Sign-On-with-Power-Platform-and-SAP-
+
+
+<!-- format TENANT-GUID, can be optained from Azure portal view for Azure AD for instance -->
+<!-- Entra-ID-tenant -->
+<!-- Entra-ID tenant where the app is registered -->
+@HBR-AADTenantId = bf806c73-21b2-493e-842a-bb596373bf0b
+<!-- format APP-GUID, obtained during app registration -->
+<!-- The Application (client) id of the Entra ID app registration representing your Azure API Management instance. -->
+@HBR-APIMAADRegisteredAppClientId = c24896d9-4975-40c4-8ad9-0bf7e3e08537
+<!-- a URL encoded secret, obtained during app registration -->
+<!-- The secret created for the application 999abce-7777-abcd-a6c9-zzzzzzzzzzz -->
+@HBR-APIMAADRegisteredAppClientSecret = PFi8Q~YbxjNJTBIOdkLwB1IxlEeRRRplta3-0di2
+<!-- an id obtained during app registration. Our guide leverages the SAP SID for this (e.g. FS1) -->
+<!-- The provider’s name from your NetWeaver SAML setup. Typically, a URL with SID followed Client number -->
+@HBR-AADSAPResource = https://pm4400
+<!-- an id obtained during OAuth setup on the SAP backend. Check SAP Transaction code SOAUTH2. -->
+<!-- # ClientID = SAP User --> 
+@HBR-SAPOAuthClientID = HOBRUCHE-SBS
+<!-- a URL encoded secret, obtained during OAuth setup on the SAP backend -->
+@HBR-SAPOAuthClientSecret = SSOSetup!
+<!-- a text, obtained during OAuth setup on the SAP backend. Likely class name of the target OData service (e.g. ZEPM_REF_APPS_PROD_MAN_SRV_0001) -->
+@HBR-SAPOAuthScope = ZAPI_BUSINESS_PARTNER_0001
+<!-- format https://{{HBR-SAPOAuthServerAdressForTokenEndpoint}}/sap/bc/sec/oauth2/token -->
+@HBR-SAPOAuthServerAdressForTokenEndpoint = 10.15.0.6:44301
+<!--- a value in ms resembling the OAuth token refresh expiry time from SAP backend. Check SAP transaction SOAUTH2 -->
+@HBR-SAPOAuthRefreshExpiry = 3600
+
+
+### Use https://devtoys24.com/encoders/jwt or other tools to check JWT and Base64 
+# Hard-coded values
+# client_id is the @HBR-APIMAADRegisteredAppClientId
+# scope is the application ID URI, api://<client_id>/user_impersonation
+https://login.microsoftonline.com/bf806c73-21b2-493e-842a-bb596373bf0b/oauth2/v2.0/authorize?client_id=c24896d9-4975-40c4-8ad9-0bf7e3e08537&response_type=token&redirect_uri=https://localhost:44326/signin-oidc&scope=openid profile api://c24896d9-4975-40c4-8ad9-0bf7e3e08537/user_impersonation&response_mode=fragment
+
+###
+### Request SAML assertion from AAD with ObO flow v2
+###
+# Assertion from previous request
+# Enter here the assertion from the previous request executed in the browser
+@assertion = eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6InoxcnNZSEhKOS04bWdndDRIc1p1OEJLa0JQdyIsImtpZCI6InoxcnNZSEhKOS04bWdndDRIc1p1OEJLa0JQdyJ9.eyJhdWQiOiJhcGk6Ly9jMjQ4OTZkOS00OTc1LTQwYzQtOGFkOS0wYmY3ZTNlMDg1MzciLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9iZjgwNmM3My0yMWIyLTQ5M2UtODQyYS1iYjU5NjM3M2JmMGIvIiwiaWF0IjoxNzM1OTA5MzU3LCJuYmYiOjE3MzU5MDkzNTcsImV4cCI6MTczNTkxNDgwNCwiYWNyIjoiMSIsImFpbyI6IkFWUUFxLzhZQUFBQXhOZGUveXNNeDIrKzFSZ3luQTY1OGEwRSs2NnBKWXh0bmJtRVRhM2VxR0VkOWVkYXF6bVVHZ3dVYzRmc0FVc1VwSlRjSmg3dkhFM0hEdFp6VFdFWkpYNXlaRFdqZ3o4a2w1TDhvMnRqT24wPSIsImFtciI6WyJwd2QiLCJtZmEiXSwiYXBwaWQiOiJjMjQ4OTZkOS00OTc1LTQwYzQtOGFkOS0wYmY3ZTNlMDg1MzciLCJhcHBpZGFjciI6IjAiLCJmYW1pbHlfbmFtZSI6Ikxvd0NvZGUiLCJnaXZlbl9uYW1lIjoiMTB4RGF5cyBvZiIsImlwYWRkciI6IjQ2LjE2NS4xNDguMjE5IiwibmFtZSI6IjEweERheXMgb2YgTG93Q29kZSIsIm9pZCI6ImY5MTgzOTU4LTM3ZGYtNDY0My04ZWI3LTQ5MWEzZDY5ZGE4MCIsInJoIjoiMS5BWGtBYzJ5QXY3SWhQa21FS3J0WlkzT19DOW1XU01KMVNjUkFpdGtMOS1QZ2hUZVVBRWQ1QUEuIiwic2NwIjoidXNlcl9pbXBlcnNvbmF0aW9uIiwic3ViIjoicm1CMDZNQlJ0UmVDRDBNMGsyR2N5UDc4TjNZZWxjZ2JLeV9OazRFRlR2ayIsInRpZCI6ImJmODA2YzczLTIxYjItNDkzZS04NDJhLWJiNTk2MzczYmYwYiIsInVuaXF1ZV9uYW1lIjoiSHVuZHJlZFhEYXlzT2ZMb3dDb2RlQHg0MmtwLm9ubWljcm9zb2Z0LmNvbSIsInVwbiI6Ikh1bmRyZWRYRGF5c09mTG93Q29kZUB4NDJrcC5vbm1pY3Jvc29mdC5jb20iLCJ1dGkiOiJzZlRzcU5iU19FMnVfbFRlNVhKTEFRIiwidmVyIjoiMS4wIn0.J8qsWm8TZWT_kImVf-ndxnLxEDBnFV9B9vj6JPRtDyu1WvrbYu5rHFOMx-jQI0kUVevn7IEwGNtXdi4OyoQGDdNe8vhBEOijavyE1p3hMO-BH44SrMQuNQsb0YtmtKZpj19A_eZ7TRQI_b-s2f0Hj55Xlvt97rADV-Ppe_mH-_aNzV4UPZkgmGKbIqEs4D6sZHf5o4CDCgRgXGrclZqPJotuy6moGXi6ss8BdMNPh4H-3tt4ur9b3oIpiLQ2thxzrsB7JSZstX40D1gTwO6op1uQszFvh5sDed7Rbc2yZ0vuXSP-RwKFxZd3v1lZ83-D0W4c5h1E-1dUEbLg5aUbUQ
+# @name fetchAccessTokenForSAP
+
+POST https://login.microsoftonline.com/{{HBR-AADTenantId}}/oauth2/v2.0/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer
+&assertion={{assertion}}
+&client_id={{HBR-APIMAADRegisteredAppClientId}}
+&client_secret={{HBR-APIMAADRegisteredAppClientSecret}}
+&scope={{HBR-AADSAPResource}}/.default
+&requested_token_use=on_behalf_of
+&requested_token_type=urn:ietf:params:oauth:token-type:saml2
+
+
+
+### Request access token from SAP backend with SAML Bearer Grant Type -RFC 7522-
+###
+
+# @name accessTokenFromSAP
+POST https://10.15.0.6:44301/sap/bc/sec/oauth2/token?sap-client=400
+Content-Type: application/x-www-form-urlencoded;charset=UTF-8
+Authorization: Basic {{HBR-SAPOAuthClientID}}:{{HBR-SAPOAuthClientSecret}}
+
+grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer
+&assertion={{fetchAccessTokenForSAP.response.body.access_token}}
+&client_id={{HBR-SAPOAuthClientID}}
+&scope={{HBR-SAPOAuthScope}}
+
+
+### Call the SAP System with the Access Token from SAP
+###
+GET https://10.15.0.6:44301/sap/opu/odata/sap/API_BUSINESS_PARTNER
+Authorization: Bearer {{accessTokenFromSAP.response.body.access_token}}
+
+### Fetch top 15 Business parnterns from SAP
+###
+GET https://10.15.0.6:44301/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartner?$top=15
+Authorization: Bearer {{accessTokenFromSAP.response.body.access_token}}
+

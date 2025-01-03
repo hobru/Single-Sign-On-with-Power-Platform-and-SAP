@@ -1,0 +1,163 @@
+<!--
+    - Policies are applied in the order they appear.
+    - Position <base/> inside a section to inherit policies from the outer scope.
+    - Comments within policies are not preserved.
+-->
+<!-- Add policies as children to the <inbound>, <outbound>, <backend>, and <on-error> elements -->
+<policies>
+    <!-- Throttle, authorize, validate, cache, or transform the requests -->
+    <inbound>
+        <base />
+        <!-- Parameters: HBR_TracingURL - URL to a POST-Dump URL like pipedream, e.g. https://eoziz0bkam8k6vo.m.pipedream.net -->
+        <!-- Tracing Start 1 Initial call from Power-->
+        <send-request mode="new" response-variable-name="hbr-Trace-1" timeout="10" ignore-error="true">
+            <set-url>{{HBR-TracingURL}}</set-url>
+            <set-method>POST</set-method>
+            <set-header name="Content-Type" exists-action="override">
+                <value>plain/text</value>
+            </set-header>
+            <set-header name="X-Custom-HBR" exists-action="override">
+                <value>Step 1 - Initial call from Power</value>
+            </set-header>
+            <set-body>Initial Call from Power Platform</set-body>
+        </send-request>
+        <!-- Tracing End 1 Initial call from Power-->
+        <!-- Get Values from Azure API Management -->
+        <!-- Variables for Exchange AAD Bearer token-->
+        <set-variable name="HBR-APIMAADRegisteredAppClientId" value="{{HBR-APIMAADRegisteredAppClientId}}" />
+        <set-variable name="HBR-APIMAADRegisteredAppClientSecret" value="{{HBR-APIMAADRegisteredAppClientSecret}}" />
+        <set-variable name="HBR-AADSAPResource" value="{{HBR-AADSAPResource}}" />
+        <!-- Tracing Start 2 Exchange AAD Bearer token -->
+        <send-request mode="new" response-variable-name="hbr-Trace-2" timeout="10" ignore-error="true">
+            <set-url>{{HBR-TracingURL}}</set-url>
+            <set-method>POST</set-method>
+            <set-header name="Content-Type" exists-action="override">
+                <value>application/json</value>
+            </set-header>
+            <set-header name="X-Custom-HBR" exists-action="override">
+                <value>Step 2 - Exchange AAD Bearer token</value>
+            </set-header>
+            <set-body>@{
+                            var _AADRegisteredAppClientId = context.Variables["HBR-APIMAADRegisteredAppClientId"];
+                            var _AADRegisteredAppClientSecret = context.Variables["HBR-APIMAADRegisteredAppClientSecret"];
+                            var _AADSAPResource = context.Variables["HBR-AADSAPResource"];
+                            var assertion = context.Request.Headers.GetValueOrDefault("Authorization","").Replace("Bearer ","");
+                            return $"grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion={assertion}&client_id={_AADRegisteredAppClientId}&client_secret={_AADRegisteredAppClientSecret}&scope={_AADSAPResource}/.default&requested_token_use=on_behalf_of&requested_token_type=urn:ietf:params:oauth:token-type:saml2";
+                        }</set-body>
+        </send-request>
+        <!-- Tracing End 2 Exchange AAD Bearer token -->
+        <!-- Exchange AAD Bearer token for AAD issued SAML token on behalf of logged in user -->
+        <send-request mode="new" response-variable-name="fetchSAMLAssertion" timeout="10" ignore-error="false">
+            <set-url>https://login.microsoftonline.com/{{HBR-AADTenantId}}/oauth2/v2.0/token</set-url>
+            <set-method>POST</set-method>
+            <set-header name="Content-Type" exists-action="override">
+                <value>application/x-www-form-urlencoded</value>
+            </set-header>
+            <set-body>@{
+                            var _AADRegisteredAppClientId = context.Variables["HBR-APIMAADRegisteredAppClientId"];
+                            var _AADRegisteredAppClientSecret = context.Variables["HBR-APIMAADRegisteredAppClientSecret"];
+                            var _AADSAPResource = context.Variables["HBR-AADSAPResource"];
+                            var assertion = context.Request.Headers.GetValueOrDefault("Authorization","").Replace("Bearer ","");
+                            return $"grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion={assertion}&client_id={_AADRegisteredAppClientId}&client_secret={_AADRegisteredAppClientSecret}&scope={_AADSAPResource}/.default&requested_token_use=on_behalf_of&requested_token_type=urn:ietf:params:oauth:token-type:saml2";
+                        }</set-body>
+        </send-request>
+        <!-- Step 1a: Put the resulting access token in the variable accessToken -->
+        <set-variable name="accessToken" value="@((string)((IResponse)context.Variables["fetchSAMLAssertion"]).Body.As<JObject>()["access_token"])" />
+        <!-- Tracing Start 3 access token -->
+        <send-request mode="new" response-variable-name="hbr-Trace-3" timeout="10" ignore-error="true">
+            <set-url>{{HBR-TracingURL}}</set-url>
+            <set-method>POST</set-method>
+            <set-header name="Content-Type" exists-action="override">
+                <value>plain/text</value>
+            </set-header>
+            <set-header name="X-Custom-HBR" exists-action="override">
+                <value>Step 3 - Access Token</value>
+            </set-header>
+            <set-body>@((string)context.Variables["accessToken"])</set-body>
+        </send-request>
+        <!-- Tracing End 3 access token -->
+        <!-- Variables for Step Request access token from SAP backend with SAML Bearer Grant Type -->
+        <set-variable name="HBR-SAPOAuthClientID" value="{{HBR-SAPOAuthClientID}}" />
+        <set-variable name="HBR-SAPOAuthClientSecret" value="{{HBR-SAPOAuthClientSecret}}" />
+        <set-variable name="HBR-SAPOAuthScope" value="{{HBR-SAPOAuthScope}}" />
+        <set-variable name="HBR-SAPOAuthRefreshExpiry" value="{{HBR-SAPOAuthRefreshExpiry}}" />
+        <!-- Step 2: Request access token from SAP backend with SAML Bearer Grant Type  -->
+        <!-- Tracing Sart 4 Get SAP backend issued Bearer token -->
+        <send-request mode="new" response-variable-name="hbr-Trace-4" timeout="10" ignore-error="true">
+            <set-url>{{HBR-TracingURL}}</set-url>
+            <set-method>POST</set-method>
+            <set-header name="Content-Type" exists-action="override">
+                <value>plain/text</value>
+            </set-header>
+            <set-header name="X-Custom-HBR" exists-action="override">
+                <value>Step 4 - Get SAP backend issued Bearer token</value>
+            </set-header>
+            <set-body>@{
+                            var _SAPOAuthClientID = context.Variables["HBR-SAPOAuthClientID"];
+                            var _SAPOAuthScope = context.Variables["HBR-SAPOAuthScope"];
+                            var assertion2 = context.Variables["accessToken"];
+                            return $"grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&assertion={assertion2}&client_id={_SAPOAuthClientID}&scope={_SAPOAuthScope}";
+                        }</set-body>
+        </send-request>
+        <!-- Tracing End 4 Get SAP backend issued Bearer token -->
+        <!-- Step 3: Get SAP backend issued Bearer token for presented AAD issued SAML token using OAuth2SAMLBearerAssertion flow. -->
+        <send-request mode="new" response-variable-name="fetchSAPBearer" timeout="10" ignore-error="false">
+            <set-url>https://{{HBR-SAPOAuthServerAdressForTokenEndpoint}}/sap/bc/sec/oauth2/token</set-url>
+            <set-method>POST</set-method>
+            <set-header name="Content-Type" exists-action="override">
+                <value>application/x-www-form-urlencoded</value>
+            </set-header>
+            <!-- Provide Authentication to SAP OAuth server. Check SAP transaction code SOAUTH2 for your individual configuration -->
+            <set-header name="Authorization" exists-action="override">
+                <value>@{
+                                var _SAPOAuthClientID = context.Variables["HBR-SAPOAuthClientID"];
+                                var _SAPOAuthClientSecret = context.Variables["HBR-SAPOAuthClientSecret"];
+                                return "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes($"{_SAPOAuthClientID}:{_SAPOAuthClientSecret}"));
+                            }</value>
+            </set-header>
+            <!--  Don't expose APIM subscription key to the backend. -->
+            <set-header name="Ocp-Apim-Subscription-Key" exists-action="delete" />
+            <set-body>@{
+                            var _SAPOAuthClientID = context.Variables["HBR-SAPOAuthClientID"];
+                            var _SAPOAuthScope = context.Variables["HBR-SAPOAuthScope"];
+                            var assertion2 = context.Variables["accessToken"];
+                            return $"grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&assertion={assertion2}&client_id={_SAPOAuthClientID}&scope={_SAPOAuthScope}";
+                        }</set-body>
+        </send-request>
+        <!-- Store the access_token from the reply in SAPBearerToken  -->
+        <set-variable name="SAPResponseObject" value="@(((IResponse)context.Variables["fetchSAPBearer"]).Body.As<JObject>())" />
+        <set-variable name="SAPBearerToken" value="@(((JObject)context.Variables["SAPResponseObject"])["access_token"].ToString())" />
+        <!-- Tracing Start 5 Now we have the Bearer Token to call the SAP OData Service -->
+        <send-request mode="new" response-variable-name="hbr-Trace-5" timeout="10" ignore-error="true">
+            <set-url>{{HBR-TracingURL}}</set-url>
+            <set-method>POST</set-method>
+            <set-header name="Content-Type" exists-action="override">
+                <value>plain/text</value>
+            </set-header>
+            <set-header name="X-Custom-HBR" exists-action="override">
+                <value>Step 5 - Final Bearer Token for SAP OData Service</value>
+            </set-header>
+            <set-body>@("Bearer " + (string)context.Variables["SAPBearerToken"])</set-body>
+        </send-request>
+        <!-- Tracing End 5 Now we have the Bearer Token to call the SAP OData Service -->
+        <!-- Step 4: Use the now optained Bearer Token to call the actual SAP Backend OData Service  -->
+        <set-header name="Authorization" exists-action="override">
+            <value>@("Bearer " + (string)context.Variables["SAPBearerToken"])</value>
+        </set-header>
+        <!--  Don't expose APIM subscription key to the backend. -->
+        <set-header name="Ocp-Apim-Subscription-Key" exists-action="delete" />
+        <set-backend-service base-url="https://10.15.0.6:44301/sap/opu/odata/sap/API_BUSINESS_PARTNER" />
+    </inbound>
+    <!-- Control if and how the requests are forwarded to services  -->
+    <backend>
+        <base />
+    </backend>
+    <!-- Customize the responses -->
+    <outbound>
+        <base />
+    </outbound>
+    <!-- Handle exceptions and customize error responses  -->
+    <on-error>
+        <base />
+    </on-error>
+</policies>
