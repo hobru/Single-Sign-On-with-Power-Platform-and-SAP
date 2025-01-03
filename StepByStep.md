@@ -85,7 +85,8 @@ Now we can sign-in from the Power Automate flow and select the Entity type from 
 
 In order to trace what is actually happening we can perform a call-out from the APIM Policy to a Webserver that just shows us the content. This can be a site like https://webhook.site/ or https://pipedream.com/ or your own HTTP server running locally. 
 
-> Note: I do not recommend to use public sites for productive environment / credentials!
+> [!IMPORTANT]
+> I do not recommend to use public sites for productive environment / credentials!
 
 In my demo-setup (all credentials / apps have been deleted after publishing this tutorial) I am using pipedream. 
 
@@ -689,6 +690,8 @@ After that we can enhance the policy with this new call to get the SAP backend i
         </send-request>
         <!-- Tracing End 5 Now we have the Bearer Token to call the SAP OData Service -->
 ```
+![APIM - Additional Policy](images/sbs/APIMLastPiece.jpg)
+
 
 After this step we have the required token to call the SAP System stored in the *SAPBearerToken* variable. So the last step in the policy is to remove the previously hard-coded username and password
 ```xml
@@ -705,6 +708,8 @@ and set the *Authentication* header and put the Bearer token there:
         <set-header name="Ocp-Apim-Subscription-Key" exists-action="delete" />
         <set-backend-service base-url="https://10.15.0.6:44301/sap/opu/odata/sap/API_BUSINESS_PARTNER" />
 ```
+![APIM - End of Policy](images/sbs/APIMEnd.jpg)
+
 
 From now own each time the API is called, the token handed over from the Power Automate flow (remember Client ID: 6bee4d13-fd19-43de-b82c-4b6401d174c3), is exchanged to a SAML token on behalf of the logged in user in Power Automate, then exchanged with a access token from SAP backend with SAML Bearer Grant Type, and finally this Bearer token can be set in the Authorization header so that the call to the actual SAP OData Service succseeds.  
 
