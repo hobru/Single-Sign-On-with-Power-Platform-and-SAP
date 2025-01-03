@@ -1,5 +1,8 @@
 # Configuring and testing SSO Setup Step-By-Step
-Upload Metadata to SAML2 Local Provider?
+This is a step-by-step configuration of the SSO flow outlined [here](README.md). 
+You can find the HTTP REST calls in [this script](REST-Client-Scripts-For-SSO.http) and the full policy used [here](APIM-Policy.xml). 
+
+The goal is not to end up with the super sophisticated Policy created by my colleague Martin Pankraz, but to show the creation of the policy and only focus on he main parts. The result is not meant to be used in production (again: here the policy from [Martin](https://github.com/Azure/api-management-policy-snippets/blob/master/examples/Request%20OAuth2%20access%20token%20from%20SAP%20using%20AAD%20JWT%20token.xml) is much better), but to help you understand the relevant steps. 
 
 ## Create a Simple API Proxy in Azure APIM
 ### Setup hard-coded SSO in the APIM Policy
@@ -23,8 +26,8 @@ In the Entra-ID tenant that also runs the Power Platform environment, register a
 Note down the first variables:
 | Properties | Value |
 |----------|----------|
-| HBR-AADTenantId | bf806c73-21b2-493e-842a-bb596373bf0b |
-| HBR-APIMAADRegisteredAppClientId | c24896d9-4975-40c4-8ad9-0bf7e3e08537 |
+| **HBR-AADTenantId** | bf806c73-21b2-493e-842a-bb596373bf0b |
+| **HBR-APIMAADRegisteredAppClientId** | c24896d9-4975-40c4-8ad9-0bf7e3e08537 |
 | HBR-APIMAADRegisteredAppClientSecret |  | 
 | HBR-AADSAPResource |  | 
 | HBR-SAPOAuthClientID |  | 
@@ -39,6 +42,10 @@ Note down the first variables:
 In this application go to Manage -> Expose an API and select Add Application ID URI, 
 ![App ID URI](images/sbs/ExposeAPI-AppID.jpg)
 
+### Add a scope
+Click on "Add a scope" and add user_impersonation
+![Add scope](images/sbs/AddScope.jpg)
+
 Leave the deafults, like api://c24896d9-4975-40c4-8ad9-0bf7e3e08537 
 
 | Properties | Value |
@@ -52,11 +59,8 @@ Leave the deafults, like api://c24896d9-4975-40c4-8ad9-0bf7e3e08537
 | HBRSAPOAuthRefreshExpiry |  | 
 | HBR-SAPOAuthScope | | 
 | HBR-SAPOAuthServerAdressForTokenEndpoint |  | 
-| Power Platform OData Connector App ID URI | api://c24896d9-4975-40c4-8ad9-0bf7e3e08537  | 
+| **Power Platform OData Connector App ID URI** | api://c24896d9-4975-40c4-8ad9-0bf7e3e08537  | 
 
-### Add a scope
-Click on "Add a scope" and add user_impersonation
-![Add scope](images/sbs/AddScope.jpg.jpg)
 
 
 ## Create a Power Automate Flow and add the SAP OData Action
@@ -78,7 +82,8 @@ Now we can sign-in from the Power Automate flow and select the Entity type from 
 ## Add external tracing to the policy
 
 In order to trace what is actually happening we can perform a call-out from the APIM Policy to a Webserver that just shows us the content. This can be a site like https://webhook.site/ or https://pipedream.com/ or your own HTTP server running locally. 
-Note: I do not recommend to use public sites for productive environment / credentials!
+
+> Note: I do not recommend to use public sites for productive environment / credentials!
 
 In my demo-setup (all credentials / apps have been deleted after publishing this tutorial) I am using pipedream. 
 
@@ -115,13 +120,13 @@ Note: In order to test this also from a REST Client, we need to *Add a platform*
 ![Authentication - Web - Redirect](images/sbs/Authentication-Redirect.jpg)
 
 This can be done manually, by calling this URL
-```http
+```text
 https://login.microsoftonline.com/<TENANT-ID>/oauth2/v2.0/authorize?client_id=<CLIENT-ID>&response_type=token&redirect_uri=https://localhost:44326/signin-oidc&scope=openid profile api://<CLIENT-ID>/user_impersonation&response_mode=fragment
 
 ```
 
 e.g. 
-```http
+```text
 https://login.microsoftonline.com/bf806c73-21b2-493e-842a-bb596373bf0b/oauth2/v2.0/authorize?client_id=c24896d9-4975-40c4-8ad9-0bf7e3e08537&response_type=token&redirect_uri=https://localhost:44326/signin-oidc&scope=openid profile api://c24896d9-4975-40c4-8ad9-0bf7e3e08537/user_impersonation&response_mode=fragment
 ```
 
@@ -134,7 +139,7 @@ In the case of the Power Automate flow, this is actully done in the background w
 
 Before we do that, lets take the access token and "look inside". For this copy the Access token from the URL. 
 Note: Make sure to only copy the token. The reply URL continues with  additional query parameters, like token_type. 
-```http
+```text
 https://localhost:44326/signin-oidc#access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6InoxcnNZSEhKOS04bWdndDRIc1p1OEJLa0JQdyIsImtpZCI6InoxcnNZSEhKOS04bWdndDRIc1p1OEJLa0JQdyJ9.eyJhdWQiOiJhcGk6Ly9jMjQ4OTZkOS00OTc1LTQwYzQtOGFkOS0wYmY3ZTNlMDg1MzciLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9iZjgwNmM3My0yMWIyLTQ5M2UtODQyYS1iYjU5NjM3M2JmMGIvIiwiaWF0IjoxNzM1NjYzNDU5LCJuYmYiOjE3MzU2NjM0NTksImV4cCI6MTczNTY2OTA3MiwiYWNyIjoiMSIsImFpbyI6IkFWUUFxLzhZQUFBQUFjYTZZRDJLclBzYjMxSG9XNU16YnI3TXIvQjJhMU5jNER0dy9JekUwdjU4THJ5NkZkMnBHZm5JSE1vUE5jZU1VZkd6VXE4WjZkWjB4djByNjV3MDRoNFI0WC9tQzVHRzQzTmNJUk5BVmJBPSIsImFtciI6WyJwd2QiLCJtZmEiXSwiYXBwaWQiOiJjMjQ4OTZkOS00OTc1LTQwYzQtOGFkOS0wYmY3ZTNlMDg1MzciLCJhcHBpZGFjciI6IjAiLCJmYW1pbHlfbmFtZSI6Ikxvd0NvZGUiLCJnaXZlbl9uYW1lIjoiMTB4RGF5cyBvZiIsImlwYWRkciI6IjE3Mi4yMDEuNzcuNDMiLCJuYW1lIjoiMTB4RGF5cyBvZiBMb3dDb2RlIiwib2lkIjoiZjkxODM5NTgtMzdkZi00NjQzLThlYjctNDkxYTNkNjlkYTgwIiwicmgiOiIxLkFYa0FjMnlBdjdJaFBrbUVLcnRaWTNPX0M5bVdTTUoxU2NSQWl0a0w5LVBnaFRlVUFFZDVBQS4iLCJzY3AiOiJ1c2VyX2ltcGVyc29uYXRpb24iLCJzdWIiOiJybUIwNk1CUnRSZUNEME0wazJHY3lQNzhOM1llbGNnYkt5X05rNEVGVHZrIiwidGlkIjoiYmY4MDZjNzMtMjFiMi00OTNlLTg0MmEtYmI1OTYzNzNiZjBiIiwidW5pcXVlX25hbWUiOiJIdW5kcmVkWERheXNPZkxvd0NvZGVAeDQya3Aub25taWNyb3NvZnQuY29tIiwidXBuIjoiSHVuZHJlZFhEYXlzT2ZMb3dDb2RlQHg0MmtwLm9ubWljcm9zb2Z0LmNvbSIsInV0aSI6IllqUnFPSm90N1VpM2hBc2xHRzgxQVEiLCJ2ZXIiOiIxLjAifQ.KdNkXcBUoMu0VATRwJZ93Xu9WogOHW9TeXkAoLAXD4O0WYALbD8tO3KjBcvzMpeLej88HAWu2MXlw3zlFs4zNxeFNVVcl_2COYbwfM--npLQ_VXs_nJg_YV5WbmLsIY-W1mW6GNRiyVXuc3b2_Qn-Hd01IQHJ-Phf2nzRYOzZnXXygYbMufPV6Uhs53_fdXrdnZQA6qL6ABZHR-pmRhJtbfDI99kMMQXoWPaMYWsTWXMTk7gd6Ul8Wc_F1-HWtLPdEtIOd1yms0YAbSwYoOp_IANqG92H3UbpvCJR6PRVAYtDUsaV2AYhoAmbk-Y_wxB2dK-FifgxX8GxacBvFEw-A&token_type=Bearer&expires_in=5312&scope=api%3a%2f%2fc24896d9-4975-40c4-8ad9-0bf7e3e08537%2fuser_impersonation&session_state=7df40107-42aa-45cd-9ba3-f79d7f0b1a53
 ```
 
@@ -191,7 +196,7 @@ Make sure to remember and write down the value of the newly created client secre
 |----------|----------|
 | HBR-AADTenantId | bf806c73-21b2-493e-842a-bb596373bf0b |
 | HBR-APIMAADRegisteredAppClientId | c24896d9-4975-40c4-8ad9-0bf7e3e08537 |
-| HBR-APIMAADRegisteredAppClientSecret | PFi8Q~YbxjNJTBIOdkLwB1IxlEeRRRplta3-0di2  | 
+| **HBR-APIMAADRegisteredAppClientSecret** | PFi8Q~YbxjNJTBIOdkLwB1IxlEeRRRplta3-0di2  | 
 | HBR-AADSAPResource |  | 
 | HBR-SAPOAuthClientID |  | 
 | HBR-SAPOAuthClientSecret |  | 
@@ -217,7 +222,7 @@ In case the Local provider is no yet configured, follow the wizard and make sure
 | HBR-AADTenantId | bf806c73-21b2-493e-842a-bb596373bf0b |
 | HBR-APIMAADRegisteredAppClientId | c24896d9-4975-40c4-8ad9-0bf7e3e08537 |
 | HBR-APIMAADRegisteredAppClientSecret | PFi8Q~YbxjNJTBIOdkLwB1IxlEeRRRplta3-0di2  | 
-| HBR-AADSAPResource | https://pm4400 | 
+| **HBR-AADSAPResource** | https://pm4400 | 
 | HBR-SAPOAuthClientID |  | 
 | HBR-SAPOAuthClientSecret |  | 
 | HBRSAPOAuthRefreshExpiry |  | 
@@ -248,7 +253,7 @@ We will now need to adjust some of the properties. Depending on the configuratio
 Now we have all the properties to call our ObO flow. However, calling
 
 
-```http
+```text
 ###
 ### Request SAML assertion from AAD with ObO flow v2
 ###
@@ -286,7 +291,7 @@ AADSTS65001: The user or administrator has not consented to use the application 
 So next we need to go back to the previously [registered app](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps) (in our case hbr-sbs-power-to-apim) and under *API Permissions* select *Add a permission* and *APIs my organization uses*. Then search for the name of the Enterprise App, e.g. *HBR - SAP NetWeaver - SBS - PM4* and select *Add permissions* with the *user_impersonation* selected.  
 ![Add Permissions for Enterprise App](images/sbs/AddPermissions.jpg)
 
-As a final step we need to click on *Grant admin consent for xxx*
+As a final step we need to click on *Grant admin consent for ...*
 ![Grant admin consent](images/sbs/GrantAdminConsent-1.jpg)
 
 ### Successfully test the ObO flow
@@ -446,9 +451,24 @@ This enhancements perform the ObO call that we did previously manually in the po
 ## Request access token from SAP backend with SAML Bearer Grant Type
 With the SAML assertion from Entra-ID for our SAP system, we are ready to call the Token end-point in the SAP system to finally get an access token from SAP to call our OData services. 
 
-The first step here is to tell the SAP system to trust Entra-ID. XXX
+The first step here is to tell the SAP system to trust Entra-ID. In the steps before we had exported the metadata information from our SAP System and imported it for the configuration of the Enterprise App. Now open the Enterprise App again and export the *Certificate (Base64)* and *Federation Metadata XML* 
+![Download Enterprise App Metadata](images/sbs/DownloadEnterpriseAppMetadata.jpg)
 
-So lets go back to the SAP system and configure an OAuth 2.0 Client ID. The first step is to create a system user via /nSU01. This user does not have any roles and permissions. Just a username and password. 
+Then on the SAP system in transaction SAML2 / SAML 2.0 Configuration of ABAP System PM4/400 (/sap/bc/webdynpro/sap/saml) click on *Trusted Providers* and select *OAuth 2.0 Identity Providers* from the *Show* drop-down. THen click on *Upload Metadata file* from the *Add* menu.
+![Upload Metadata](images/sbs/UploadMetadata-FromEA.jpg)
+
+In the first step upload the metadata file
+![Upload Metadata - Step 1](images/sbs/Step1-Metadata.jpg)
+
+In the next step upload the certificate and continue through the wizard. 
+![Upload Certificate - Step 2](images/sbs/Step2-Certificate.jpg)
+
+As a last step, select E-Mail as the Supported NameID Formats
+![Map Emails](images/sbs/Mapping-Email.jpg)
+
+
+
+The next step is to configure an OAuth 2.0 Client ID. The first step is to create a system user via /nSU01. This user does not have any roles and permissions. Just a username and password. 
 ![SAP Client ID - SU01](images/sbs/ClientIDUser.jpg)
 
 | Properties | Value |
@@ -457,8 +477,8 @@ So lets go back to the SAP system and configure an OAuth 2.0 Client ID. The firs
 | HBR-APIMAADRegisteredAppClientId | c24896d9-4975-40c4-8ad9-0bf7e3e08537 |
 | HBR-APIMAADRegisteredAppClientSecret | PFi8Q~YbxjNJTBIOdkLwB1IxlEeRRRplta3-0di2  | 
 | HBR-AADSAPResource | https://pm4400 | 
-| HBR-SAPOAuthClientID | HOBRUCHE-SBS | 
-| HBR-SAPOAuthClientSecret | SetupSSO! | 
+| **HBR-SAPOAuthClientID** | HOBRUCHE-SBS | 
+| **HBR-SAPOAuthClientSecret** | SetupSSO! | 
 | HBRSAPOAuthRefreshExpiry |  | 
 | HBR-SAPOAuthScope | | 
 | HBR-SAPOAuthServerAdressForTokenEndpoint |  | 
@@ -478,7 +498,7 @@ From there click on *Create* to create a new Client and select the user that we 
 | HBR-AADSAPResource | https://pm4400 | 
 | HBR-SAPOAuthClientID | HOBRUCHE-SBS | 
 | HBR-SAPOAuthClientSecret | SetupSSO! | 
-| HBRSAPOAuthRefreshExpiry | 3600 | 
+| **HBRSAPOAuthRefreshExpiry** | 3600 | 
 | HBR-SAPOAuthScope | | 
 | HBR-SAPOAuthServerAdressForTokenEndpoint | | 
 | Power Platform OData Connector App ID URI | api://c24896d9-4975-40c4-8ad9-0bf7e3e08537  |
@@ -501,7 +521,7 @@ Once the OData services is enabled for OAuth, you can select it from the list, e
 | HBR-SAPOAuthClientID | HOBRUCHE-SBS | 
 | HBR-SAPOAuthClientSecret | SetupSSO! | 
 | HBRSAPOAuthRefreshExpiry | 3600 | 
-| HBR-SAPOAuthScope | ZAPI_BUSINESS_PARTNER_0001 | 
+| **HBR-SAPOAuthScope** | ZAPI_BUSINESS_PARTNER_0001 | 
 | HBR-SAPOAuthServerAdressForTokenEndpoint | | 
 | Power Platform OData Connector App ID URI | api://c24896d9-4975-40c4-8ad9-0bf7e3e08537  |
 
@@ -509,7 +529,7 @@ Once the OData services is enabled for OAuth, you can select it from the list, e
 ### Call SAP Backend to request access token
 Now it is time to test the service again and we can try to request an access token from the SAP Backend system. For this we call a call to the SAP Token service:
 
-```http
+```text
 # @name accessTokenFromSAP
 POST https://<SAP-SYSTEM>>:<SAP-PORT>/sap/bc/sec/oauth2/token?sap-client=400
 Content-Type: application/x-www-form-urlencoded;charset=UTF-8
