@@ -4,6 +4,8 @@ You can find the HTTP REST calls in [this script](REST-Client-Scripts-For-SSO.ht
 
 The goal is not to end up with the super sophisticated Policy created by my colleague Martin Pankraz, but to show the creation of the policy and only focus on he main parts. The result is not meant to be used in production (again: here the policy from [Martin](https://github.com/Azure/api-management-policy-snippets/blob/master/examples/Request%20OAuth2%20access%20token%20from%20SAP%20using%20AAD%20JWT%20token.xml) is much better), but to help you understand the relevant steps. 
 
+> [!IMPORTANT] Whenever I follow tutorials, I find it super helpful to find "real" values in the documentation. Because of this I have litterally copy and pasted all the values, names and credentials from my setup in this document. I have used very simple passwords (which I obviously don't use in my real configuration) and I have also deleted all the configurations afterwards. I hope this helps you as well and does not encourage you to hack my demo system :-)
+
 ## Create a Simple API Proxy in Azure APIM
 ### Setup hard-coded SSO in the APIM Policy
 The goal of this Step by step setup is to end-up with the most important parts of the APIM Policy that is also avaialble here, [AzureSAPODataReader](https://github.com/MartinPankraz/AzureSAPODataReader?tab=readme-ov-file). My colleauge Martin Pankraz has created this amazing policy which can do much more than just a simple SSO flow. However, when you look at it the first time, it can be overwhelming. That's why we set it up step by step.
@@ -109,6 +111,8 @@ With this we can update the policy to make a callout to this URL whenever the AP
         </send-request>
 ```
 ![APIM Policy](images/sbs/APIM-Policy1.jpg)
+> [!TIP]
+> The final policy of this exercise can be found [here](APIM-Policy.xml)
 
 Now each time the API is called, we can see a trace in pipedream. 
 ![Pipedream](images/sbs/Pipedream1.jpg)
@@ -116,7 +120,8 @@ Now each time the API is called, we can see a trace in pipedream.
 ## Get Assertion from Entra-ID
 With the application that we have now registered, we can get an assertion (which we can later use in our authentication flow). 
 
-Note: In order to test this also from a REST Client, we need to *Add a platform* under Authentication of type Web with the redirect URL https://localhost:44326/signin-oidc 
+> [!TIP]
+> In order to test this also from a REST Client, we need to *Add a platform* under Authentication of type Web with the redirect URL https://localhost:44326/signin-oidc 
 ![Authentication - Web - Redirect](images/sbs/Authentication-Redirect.jpg)
 
 This can be done manually, by calling this URL
@@ -151,6 +156,9 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6InoxcnNZSEhKOS04bWdndDRIc1p1OEJLa0JQ
 
 You can use website like https://jwt.io/ or https://jwt.ms/ to analyse the token. I prefer [DevToys](https://devtoys.app/) which can be installed locally.  
 ![JWT Token in DevToys](images/sbs/DevToys.jpg)
+
+> [!IMPORTANT]
+> You should never use public sites for production credentials / tokens
 
 ```json
 {
@@ -273,6 +281,9 @@ grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer
 &requested_token_use=on_behalf_of
 &requested_token_type=urn:ietf:params:oauth:token-type:saml2
 ```
+
+> [!TIP]
+> All the REST calls can be found in [this http file](REST-Client-Scripts-For-SSO.http)
 
 Results in an error message 
 ```text
@@ -507,7 +518,7 @@ In the step *Client Authentication* click on Next and in the step *Grant Type Se
 ![Select Trusted OAuth IdP](images/sbs/SelectTrustedOAuth.jpg)
 
 In the last step *Scope Assignment* we can select the OData Services that can be accessed via this OAuth Client ID. In our case this is the Business Partner API. If you have not yet done so, go to Transcation /n/IWFND/MAINT_SERVICE and select the API. Then click on *OAuth* and save the service. Here you can also see the Scope. 
-![Configure OData for OAuth](images/sbs/OAuthServiceConfig)
+![Configure OData for OAuth](images/sbs/OAuthActivate.jpg)
 
 Once the OData services is enabled for OAuth, you can select it from the list, e.g. ZAPI_BUSINESS_PARTNER_0001 and finish the wizard. 
 ![Configure OData for OAuth](images/sbs/AddScopeID.jpg)
