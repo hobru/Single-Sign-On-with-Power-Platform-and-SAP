@@ -1,9 +1,12 @@
-# Single-Sign-On-with-Power-Platform-and-SAP
-Single Sign-On with Power Platform and SAP 
+# Single Sign-On with Power Platform and SAP
 
-This repo is intended to support the videos on configuring Single Sign-On (SSO) for the Power Platform (including Copilot Studio) with SAP. We will concentrate on SSO for the SAP OData Connector, which allows a SAML2 / OAuth flow.
 
-There are lot of great (official) documentations already available, and this guide is supposed to support, extend, summarize and supplement all of them. Let me know if you found additional useful information. 
+This repo is intended to support the [videos on configuring Single Sign-On](https://youtu.be/NSE--fVLdUg) (SSO) for the Power Platform (including Copilot Studio) with SAP. We will concentrate on SSO for the SAP OData Connector, which allows a SAML2 / OAuth flow.
+![Power Platform + SAP OData - Single Sign-On - Happy path](https://www.youtube.com/watch?v=NSE--fVLdUg)
+
+In this section we talk about the "Happy-Path". Without a lot of explanations and background information we just show the steps that you should configure to get it working. If you want to understand more of what and why, there is a [step-by-step guide](StepByStep.md) available as well. 
+
+Then there are lot of great (official) documentations already available as well, and this guide is supposed to support, extend, summarize and supplement all of them. Let me know if you found additional useful information. 
 
 | Name & Link | Comment |
 |----------|----------|
@@ -17,15 +20,24 @@ There are lot of great (official) documentations already available, and this gui
 # Identifying the OData Service
 | Transaction | Comment |
 |----------|----------|
+| /nBP | In this demo we are using Business Partners; BP is the transaction to create / view business partners |
 | /n/IWFND/maint_service | Find and activate SAP OData services |
 | /n/IWFND/GW_CLIENT | Test SAP OData services directly in the SAP system |
-| /nSMICF ??? | Verify if services are active in your SAP system |
+| /nSAML2 | SAML 2.0 Configuration of ABAP System |
+| /nSOAUTH2 | OAuth 2.0 Administration |
+| https://[HOSTNAME]:[PORT]/sap/bc/webdynpro/sap/sec_diag_tool?sap-client=[CLIENT] | SAP Diag Trace |
+| /nSICF | Activate and verify services in your SAP system |
 
 
 ## Testing the OData Service
+You can identify SAP OData Services (and other APIs) in the [SAP Business Accelerator Hub](https://api.sap.com). Once identified use transaction */n/IWFND/maint_service* to find and activate the service in your SAP System. 
+![Maint_service](images/Maint_service.jpg)
+
 
 # Setup trust relationship between SAP and Microsoft Entra ID using SAML 2.0
 ## Configuring the SAP System - Setup SAML Provider
+Open Transaction */nSAML2* and export the Metadata
+[Link](https://www.youtube.com/watch?v=NSE--fVLdUg&t=215s)
 ![SAML Configuration - Provider](images/SAP-SAML2-Providername.jpg)
 
 ## Create a Microsoft Entra ID enterprise application to re-present the SAP System
@@ -38,6 +50,8 @@ Logout URL: https://microsoftintegrationdemo.com:44301/sap/saml2/sp/slo/400
 
 # Configure SAP OAuth
 ## Create the User
+![Create User](images/CreateUser.jpg)
+
 ## OAuth 2.0 Administration
 ![OAuth 2.0 Administration](images/SAP-OAuth-1.jpg)
 ![OAuth 2.0 Administration - Scope Assignment](images/SAP-OAuth-2.jpg)
@@ -72,15 +86,15 @@ Set Redirect URIs to https://localhost:44326/signin-oidc.
 ### Collect all required properties
 | Properties | Example | How to get there? | Screenshot | 
 |----------|----------|----------|----------|
-| HBR-APIMAADRegisteredAppClientId | 481cc3b6-1eec-474d-82b6-d675a1f925e3 | [Registered App](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps) | ![HBR-APIMAADRegisteredAppClientId]() | 
-| HBR-APIMAADRegisteredAppClientSecret | 45W8Q~0PxMdOWs3oMlEdXIOY1uHYcb6-L0y2WbPO | [Registered App](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps)  |![HBR-APIMAADRegisteredAppClientSecret]() | 
-| HBR-AADSAPResource | https://pm4400 | Transaction SAML2 | ![HBR-AADSAPResource]() | 
-| HBR-AADTenantId | bf806c73-21b2-493e-842a-bb596373bf0b | [Azure Portal Overview](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/Overview) | ![HBR-AADTenantId]() | 
-| HBR-SAPOAuthClientID | OAUTH-HOBRUC | Transaction SOAUTH2 | ![HBR-SAPOAuthClientID]() | 
-| HBR-SAPOAuthClientSecret | SetupSSO! | Transaction SU01 | ![HBR-SAPOAuthClientSecret]() | 
-| HBRSAPOAuthRefreshExpiry | 3600 | Transaction SAML2 | ![HBRSAPOAuthRefreshExpiry]() | 
-| HBR-SAPOAuthScope | ZAPI_BANKACCOUNT_SRV_0001 ZAPI_MATERIAL_STOCK_SRV_0001 | Transaction SAML2 | ![HBR-SAPOAuthScope]() | 
-| HBR-SAPOAuthServerAdressForTokenEndpoint | 10.15.0.6:44301 | Transaction SAML2  | ![HBR-SAPOAuthServerAdressForTokenEndpoint]() | 
+| HBR-APIMAADRegisteredAppClientId | 481cc3b6-1eec-474d-82b6-d675a1f925e3 | [Registered App](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps) | ![HBR-APIMAADRegisteredAppClientId](images/HBR-APIMAADRegisteredAppClientId.png) | 
+| HBR-APIMAADRegisteredAppClientSecret | 45W8Q~0PxMdOWs3oMlEdXIOY1uHYcb6-L0y2WbPO | [Registered App](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps)  |![HBR-APIMAADRegisteredAppClientSecret](images/HBR-APIMAADRegisteredAppClientSecret.png) | 
+| HBR-AADSAPResource | https://pm4400 | Transaction SAML2 | ![HBR-AADSAPResource](images/HBR-AADSAPResource.png) | 
+| HBR-AADTenantId | bf806c73-21b2-493e-842a-bb596373bf0b | [Azure Portal Overview](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/Overview) | ![HBR-AADTenantId](images/HBR-AADTenantId.png) | 
+| HBR-SAPOAuthClientID | OAUTH-HOBRUC | Transaction SOAUTH2 | ![HBR-SAPOAuthClientID](images/HBR-SAPOAuthClientID.png) | 
+| HBR-SAPOAuthClientSecret | SetupSSO! | Transaction SU01 | ![HBR-SAPOAuthClientSecret](images/HBR-SAPOAuthClientSecret.png) | 
+| HBRSAPOAuthRefreshExpiry | 3600 | Transaction SAML2 | see screenshot below | 
+| HBR-SAPOAuthScope | ZAPI_BANKACCOUNT_SRV_0001 ZAPI_MATERIAL_STOCK_SRV_0001 | Transaction SAML2 | ![HBR-SAPOAuthScope](images/HBR-SAPOAuthScope.png) | 
+| HBR-SAPOAuthServerAdressForTokenEndpoint | 10.15.0.6:44301 | Transaction SAML2  | check transaction /nSMICM | 
 
         
         		
