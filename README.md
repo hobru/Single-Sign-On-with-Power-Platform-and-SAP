@@ -30,6 +30,8 @@ Then there are lot of great (official) documentations already available as well,
 
 
 ## Testing the OData Service
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=260s)
+
 You can identify SAP OData Services (and other APIs) in the [SAP Business Accelerator Hub](https://api.sap.com). Once identified use transaction */n/IWFND/maint_service* to find and activate the service in your SAP System. 
 ![Maint_service](images/Maint_service.jpg)
 
@@ -37,10 +39,13 @@ You can identify SAP OData Services (and other APIs) in the [SAP Business Accele
 # Setup trust relationship between SAP and Microsoft Entra ID using SAML 2.0
 ## Configuring the SAP System - Setup SAML Provider
 Open Transaction */nSAML2* and export the Metadata
-[Link](https://www.youtube.com/watch?v=NSE--fVLdUg&t=215s)
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=215s)
+
 ![SAML Configuration - Provider](images/SAP-SAML2-Providername.jpg)
 
 ## Create a Microsoft Entra ID enterprise application to re-present the SAP System
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=275s)
+
 ![SAML Configuration](images/EA-SAMLConfiguration1.jpg)
 Logout URL: https://microsoftintegrationdemo.com:44301/sap/saml2/sp/slo/400
 ![SAML Configuration](images/EA-SAML-Overview.jpg)
@@ -50,39 +55,63 @@ Logout URL: https://microsoftintegrationdemo.com:44301/sap/saml2/sp/slo/400
 
 # Configure SAP OAuth
 ## Create the User
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=585s)
+
 ![Create User](images/CreateUser.jpg)
 
 ## OAuth 2.0 Administration
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=615s)
+
 ![OAuth 2.0 Administration](images/SAP-OAuth-1.jpg)
 ![OAuth 2.0 Administration - Scope Assignment](images/SAP-OAuth-2.jpg)
 
 
 # Set up a Microsoft Entra ID application that grants access to the Microsoft Power Platform SAP OData app registration
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=715s)
+
 ![App Registration Overview](images/AR-Overview.jpg)
 ## Authentication
 Select Authentication > Add a platform > Web.
 Set Redirect URIs to https://localhost:44326/signin-oidc.
 
 ## Certificate and Secrets
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=735s)
+
 ![App Certificate & Secrets](images/AR-Certificate+Secrets.jpg)
 
 ## API Permissions
 ![App API Permissions](images/AR-APIPermissions.jpg)
 ### openid
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=765s)
+
 ### Enterprise App 
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=785s)
+
 ## Expose an API
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=825s)
+
 ![App Expose API](images/AR-ExposeAPI.jpg)
-### Add Application ID URI
+
 ### Add Scope
 ### Add Enterprise App
-### Add Power Platform App
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=865s)
+
+### Add Power Platform SAP OData Connector App
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=890s)
+
 ### Grant Consent
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=810s)
 
 # Usermapping via Email
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=1170s)
 
 # Azure API Management
 ## Create OData API
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=925s)
+
 ## Add Named Values
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=975s)
+
 ### Collect all required properties
 | Properties | Example | How to get there? | Screenshot | 
 |----------|----------|----------|----------|
@@ -96,25 +125,13 @@ Set Redirect URIs to https://localhost:44326/signin-oidc.
 | HBR-SAPOAuthScope | ZAPI_BANKACCOUNT_SRV_0001 ZAPI_MATERIAL_STOCK_SRV_0001 | Transaction SAML2 | ![HBR-SAPOAuthScope](images/HBR-SAPOAuthScope.png) | 
 | HBR-SAPOAuthServerAdressForTokenEndpoint | 10.15.0.6:44301 | Transaction SAML2  | check transaction /nSMICM | 
 
-        
-        		
-                
-                
-                        
-                
-            
-        
-        
-        
-                
 
 ## Add Policy
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=1115s)
 
 # Power Platform
-## Create Power Automate Flow
-## Add SAP OData Action
 ## Test from Power App
-
+[Video](https://www.youtube.com/watch?v=NSE--fVLdUg&t=1185s)
 
 
 
