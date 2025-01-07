@@ -11,6 +11,7 @@ This repo is intended to support the [videos on configuring Single Sign-On](http
 
 Then there are lot of great (official) documentations already available as well, and this guide is supposed to support, extend, summarize and supplement all of them. Let me know if you found additional useful information. 
 
+## Useful links
 | Name & Link | Comment |
 |----------|----------|
 | [Set up Microsoft Entra ID, Azure API Management, and SAP for SSO from SAP OData connector](https://learn.microsoft.com/en-us/power-platform/sap/connect/entra-id-apim-oauth) | Official documentation to setup SSO |
