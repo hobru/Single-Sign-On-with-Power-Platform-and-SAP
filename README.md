@@ -2,9 +2,12 @@
 
 
 This repo is intended to support the [videos on configuring Single Sign-On](https://youtu.be/NSE--fVLdUg) (SSO) for the Power Platform (including Copilot Studio) with SAP. We will concentrate on SSO for the SAP OData Connector, which allows a SAML2 / OAuth flow.
-![Power Platform + SAP OData - Single Sign-On - Happy path](https://www.youtube.com/watch?v=NSE--fVLdUg)
+[Power Platform + SAP OData - Single Sign-On - Happy path](https://www.youtube.com/watch?v=NSE--fVLdUg)
+[![Power Platform + SAP OData - Single Sign-On - Happy path](./images/Thumb.jpg)](https://www.youtube.com/watch?v=VMAHSn_QgXQ&t=750s)
 
-In this section we talk about the "Happy-Path". Without a lot of explanations and background information we just show the steps that you should configure to get it working. If you want to understand more of what and why, there is a [step-by-step guide](StepByStep.md) available as well. 
+😁 In this section we talk about the "Happy-Path". Without a lot of explanations and background information we just show the steps that you should configure to get it working. 
+
+🚶‍♀️‍➡️If you want to understand more of what and why, there is a [step-by-step guide](StepByStep.md) available as well. 
 
 Then there are lot of great (official) documentations already available as well, and this guide is supposed to support, extend, summarize and supplement all of them. Let me know if you found additional useful information. 
 

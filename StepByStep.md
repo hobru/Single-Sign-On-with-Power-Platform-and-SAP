@@ -99,7 +99,7 @@ With this we can update the policy to make a callout to this URL whenever the AP
 
 ```xml
         <!-- Parameters: HBR-TracingURL - URL to a POST-Dump URL like pipedream, e.g. https://eoziz0bkam8k6vo.m.pipedream.net -->
-<!-- Tracing 1 -->
+        <!-- Tracing 1 -->
         <send-request mode="new" response-variable-name="hbr-Trace-1" timeout="10" ignore-error="true">
             <set-url>{{HBR-TracingURL}}</set-url>
             <set-method>POST</set-method>
@@ -422,7 +422,6 @@ and then enhance the policy with these steps (right after the previous *</send-r
                         }</set-body>
         </send-request>
         <!-- Tracing End Exchange AAD Bearer token -->
-
         <!-- Exchange AAD Bearer token for AAD issued SAML token on behalf of logged in user -->
         <send-request mode="new" response-variable-name="fetchSAMLAssertion" timeout="10" ignore-error="false">
             <set-url>https://login.microsoftonline.com/{{HBR-AADTenantId}}/oauth2/v2.0/token</set-url>
@@ -453,6 +452,7 @@ and then enhance the policy with these steps (right after the previous *</send-r
             <set-body>@((string)context.Variables["accessToken"])</set-body>
         </send-request>
         <!-- Tracing End access token -->
+
 ```
 ![Enhance Policy - 1](images/sbs/EnhancePolicy2.jpg)
 ![Enhance Policy - 2](images/sbs/EnhancePolicy3.jpg)
@@ -633,6 +633,11 @@ For this new step, we need additional variables: HBR-SAPOAuthClientID, HBR-SAPOA
 
 After that we can enhance the policy with this new call to get the SAP backend issued Bearer token using OAuth2SAMLBearerAssertion flow
 ```xml
+        <!-- Variables for Step Request access token from SAP backend with SAML Bearer Grant Type -->
+        <set-variable name="HBR-SAPOAuthClientID" value="{{HBR-SAPOAuthClientID}}" />
+        <set-variable name="HBR-SAPOAuthClientSecret" value="{{HBR-SAPOAuthClientSecret}}" />
+        <set-variable name="HBR-SAPOAuthScope" value="{{HBR-SAPOAuthScope}}" />
+        <set-variable name="HBR-SAPOAuthRefreshExpiry" value="{{HBR-SAPOAuthRefreshExpiry}}" />
         <!-- Tracing Sart 4 Get SAP backend issued Bearer token -->
         <send-request mode="new" response-variable-name="hbr-Trace-4" timeout="10" ignore-error="true">
             <set-url>{{HBR-TracingURL}}</set-url>
@@ -691,6 +696,7 @@ After that we can enhance the policy with this new call to get the SAP backend i
             <set-body>@("Bearer " + (string)context.Variables["SAPBearerToken"])</set-body>
         </send-request>
         <!-- Tracing End 5 Now we have the Bearer Token to call the SAP OData Service -->
+
 ```
 ![APIM - Additional Policy](images/sbs/APIMLastPiece.jpg)
 
@@ -708,7 +714,6 @@ and set the *Authentication* header and put the Bearer token there:
         </set-header>
         <!--  Don't expose APIM subscription key to the backend. -->
         <set-header name="Ocp-Apim-Subscription-Key" exists-action="delete" />
-        <set-backend-service base-url="https://10.15.0.6:44301/sap/opu/odata/sap/API_BUSINESS_PARTNER" />
 ```
 ![APIM - End of Policy](images/sbs/APIMEnd.jpg)
 
