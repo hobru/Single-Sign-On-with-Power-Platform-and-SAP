@@ -5,7 +5,8 @@
 ### The first call (https://login.microsoftonline.com/...) is a manual step to get the SAML assertion which has to be called in a browser window
 ### The other calls can be executed in the REST Client extension
 ### For more information on the OAuth 2.0 On-Behalf-Of flow, see https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow
-### and check out the repo at https://github.com/hobru/Single-Sign-On-with-Power-Platform-and-SAP-
+### and check out the repo at https://github.com/hobru/Single-Sign-On-with-Power-Platform-and-SAP
+### A video walking through this HTTP file can be found on https://youtube.com/SAPonAzure
 
 
 <!-- format TENANT-GUID, can be optained from Azure portal view for Azure AD for instance -->
