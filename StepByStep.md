@@ -6,8 +6,8 @@ You can find the
 * the full policy used [here](APIM-Policy.xml). 
 
 
-[Power Platform + SAP OData - Single Sign-On - Happy path](https://youtu.be/AcM67FBIEB4)
-[![Power Platform + SAP OData - Single Sign-On - Happy path](./images/sbs/Thumb2.png)](https://youtu.be/AcM67FBIEB4)
+[Power Platform + SAP OData - Single Sign-On - step-by-step](https://youtu.be/AcM67FBIEB4)
+[![Power Platform + SAP OData - Single Sign-On - step-by-step](./images/sbs/Thumb2.png)](https://youtu.be/AcM67FBIEB4)
 
 
 
