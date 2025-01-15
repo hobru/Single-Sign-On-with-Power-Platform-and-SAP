@@ -146,7 +146,6 @@
         </set-header>
         <!--  Don't expose APIM subscription key to the backend. -->
         <set-header name="Ocp-Apim-Subscription-Key" exists-action="delete" />
-        <set-backend-service base-url="https://10.15.0.6:44301/sap/opu/odata/sap/API_BUSINESS_PARTNER" />
     </inbound>
     <!-- Control if and how the requests are forwarded to services  -->
     <backend>
