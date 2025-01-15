@@ -1,6 +1,15 @@
 # Configuring and testing SSO Setup Step-By-Step
 This is a step-by-step configuration of the SSO flow outlined [here](README.md). 
-You can find the HTTP REST calls in [this script](REST-Client-Scripts-For-SSO.http) and the full policy used [here](APIM-Policy.xml). 
+
+You can find the 
+* HTTP REST calls in [this script](REST-Client-Scripts-For-SSO.http) and 
+* the full policy used [here](APIM-Policy.xml). 
+
+
+[Power Platform + SAP OData - Single Sign-On - Happy path](https://youtu.be/AcM67FBIEB4)
+[![Power Platform + SAP OData - Single Sign-On - Happy path](./images/sbs/Thumb2.png)](https://youtu.be/AcM67FBIEB4)
+
+
 
 The goal is not to end up with the super sophisticated Policy created by my colleague Martin Pankraz, but to show the creation of the policy and only focus on he main parts. The result is not meant to be used in production (again: here the policy from [Martin](https://github.com/Azure/api-management-policy-snippets/blob/master/examples/Request%20OAuth2%20access%20token%20from%20SAP%20using%20AAD%20JWT%20token.xml) is much better), but to help you understand the relevant steps. 
 
