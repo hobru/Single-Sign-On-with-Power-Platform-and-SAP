@@ -20,6 +20,7 @@ Then there are lot of great (official) documentations already available as well,
 | [Request OAuth2 access token from SAP using AAD JWT token](https://github.com/Azure/api-management-policy-snippets/blob/master/examples/Request%20OAuth2%20access%20token%20from%20SAP%20using%20AAD%20JWT%20token.xml) | Policy for Azure APIM by Martin |
 | [Episode 3.​ Configure SAP Principal Propagation with AAD and SAP OAuth server](https://www.youtube.com/watch?v=agd0ygiO1Lg&list=PLvqyDwoCkBXZ85LoFrNWv9Mj88TiDAc4g&index=5) | Video by Martin explaining the SSO setup | 
 | [AzureSAPODataReader](https://github.com/MartinPankraz/AzureSAPODataReader?tab=readme-ov-file) | Repo by Martin talking explaning the SSO setup | 
+| [Perform SAP Principal Propagation with Microsoft Entra ID for SAP SuccessFactors!](https://community.sap.com/t5/technology-blogs-by-members/perform-sap-principal-propagation-with-microsoft-entra-id-for-sap/ba-p/13860532)| For SAP SFSF the setup looks slightly different. Follow Martins blog post to setup with SAP APIM | 
 
 # Identifying the OData Service
 | Transaction | Comment |
