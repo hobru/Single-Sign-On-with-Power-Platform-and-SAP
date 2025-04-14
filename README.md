@@ -3,7 +3,7 @@
 
 This repo is intended to support the [videos on configuring Single Sign-On](https://youtu.be/NSE--fVLdUg) (SSO) for the Power Platform (including Copilot Studio) with SAP. We will concentrate on SSO for the SAP OData Connector, which allows a SAML2 / OAuth flow.
 [Power Platform + SAP OData - Single Sign-On - Happy path](https://www.youtube.com/watch?v=NSE--fVLdUg)
-[![Power Platform + SAP OData - Single Sign-On - Happy path](./images/Thumb.jpg)](https://www.youtube.com/watch?v=VMAHSn_QgXQ)
+[![Power Platform + SAP OData - Single Sign-On - Happy path](./images/Thumb.jpg)](https://www.youtube.com/watch?v=NSE--fVLdUg)
 
 😁 In this section we talk about the "Happy-Path". Without a lot of explanations and background information we just show the steps that you should configure to get it working. 
 
@@ -22,6 +22,7 @@ Then there are lot of great (official) documentations already available as well,
 | [Policy for SAP SuccessFactors](https://api.sap.com/policytemplate/SuccessFactors_Principal_Propagation_via_Entra_Id) | Policy for SAP Successfactors by Martin |
 | [Episode 3.​ Configure SAP Principal Propagation with AAD and SAP OAuth server](https://www.youtube.com/watch?v=agd0ygiO1Lg&list=PLvqyDwoCkBXZ85LoFrNWv9Mj88TiDAc4g&index=5) | Video by Martin explaining the SSO setup | 
 | [AzureSAPODataReader](https://github.com/MartinPankraz/AzureSAPODataReader?tab=readme-ov-file) | Repo by Martin talking explaning the SSO setup | 
+| [Perform SAP Principal Propagation with Microsoft Entra ID for SAP SuccessFactors!](https://community.sap.com/t5/technology-blogs-by-members/perform-sap-principal-propagation-with-microsoft-entra-id-for-sap/ba-p/13860532)| For SAP SFSF the setup looks slightly different. Follow Martins blog post to setup with SAP APIM | 
 
 
 # Identifying the OData Service
