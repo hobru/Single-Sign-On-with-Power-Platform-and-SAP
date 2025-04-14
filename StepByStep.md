@@ -306,6 +306,11 @@ AADSTS50105: Your administrator has configured the application HBR - SAP NetWeav
 So we need to first allow users to call the enterprise app. Select *Users and Groups*, click on *+Add user/group*, *None selected* and select all the users that should be able to leverage the Single Sign-On flow. 
 ![Assigned Users](images/sbs/AssignedUsers.jpg)
 
+> [!Note]
+> You can also change the setting *Assignment Required* to *No* if you want to allow all users to access the enterprise app. 
+> ![Assigned Users](images/sbs/AssignmentRequired.jpg)
+
+
 Performing the previous ObO call results in another error:
 ```text
 AADSTS65001: The user or administrator has not consented to use the application with ID 'c24896d9-4975-40c4-8ad9-0bf7e3e08537' named 'hbr-sbs-power-to-apim'. Send an interactive authorization request for this user and resource.
@@ -593,6 +598,10 @@ Requested recipient is: https://10.15.0.6:44301/sap/bc/sec/oauth2/token)
 
 So lets go back to the [Enterprise App](https://portal.azure.com/#view/Microsoft_AAD_IAM/StartboardApplicationsMenuBlade/~/AppAppsPreview/menuId~/null) and change the Reply URL to the new value:
 ![Change Reply URL](images/sbs/ChangeReplyURL.jpg)
+
+> [!Note]
+> If you were already using an Enterprise app (for example for a  SAML authentications), you can just add the token URL as an additional Reply URL. Just make sure that the order is like this:
+>  ![Change Reply URL](images/sbs/SecondReplyURL.jpg)
 
 With this change, we can run through the Token dance again. If you check the access token you should now see the updated recipient
 ```xml

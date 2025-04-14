@@ -18,8 +18,11 @@ Then there are lot of great (official) documentations already available as well,
 | [Principal propagation in a multi-cloud solution between Microsoft Azure and SAP, Part V: Production readiness with unified API- and infrastructure management](https://community.sap.com/t5/technology-blogs-by-members/principal-propagation-in-a-multi-cloud-solution-between-microsoft-azure-and/ba-p/13544042) | Amazing Blog post series by Martin Raepple |
 | [.NET speaks OData too – how to implement Azure App Service with SAP Gateway](https://community.sap.com/t5/enterprise-resource-planning-blogs-by-members/net-speaks-odata-too-how-to-implement-azure-app-service-with-sap-gateway/ba-p/13493577)  | Martin Pankraz has created all the policies and concept that we are using here. This is one of his blog posts that talks about SSO |
 | [Request OAuth2 access token from SAP using AAD JWT token](https://github.com/Azure/api-management-policy-snippets/blob/master/examples/Request%20OAuth2%20access%20token%20from%20SAP%20using%20AAD%20JWT%20token.xml) | Policy for Azure APIM by Martin |
+| [Policy for SAP API Management](https://api.sap.com/policytemplate/Principal_Propagation_via_Entra_Id) | Another cool Policy for SAP APIM by Martin |
+| [Policy for SAP SuccessFactors](https://api.sap.com/policytemplate/SuccessFactors_Principal_Propagation_via_Entra_Id) | Policy for SAP Successfactors by Martin |
 | [Episode 3.​ Configure SAP Principal Propagation with AAD and SAP OAuth server](https://www.youtube.com/watch?v=agd0ygiO1Lg&list=PLvqyDwoCkBXZ85LoFrNWv9Mj88TiDAc4g&index=5) | Video by Martin explaining the SSO setup | 
 | [AzureSAPODataReader](https://github.com/MartinPankraz/AzureSAPODataReader?tab=readme-ov-file) | Repo by Martin talking explaning the SSO setup | 
+
 
 # Identifying the OData Service
 | Transaction | Comment |
